@@ -98,17 +98,37 @@ class DataProfiling(object):
 
         self.numeric_data = data[self.numerical_columns]
         self.string_data = data[self.string_columns]
-        if len(self.datetime_identification())>0:
-            self.datetime_data = data[self.datetime_columns].applymap(lambda x: parse(x) if not x is np.nan else x )
-        else: self.datetime_data = pd.DataFrame()
+            #if len(self.datetime_identification())>0:
+            #self.datetime_data = data[self.datetime_columns].applymap(lambda x: parse(x) if not x is np.nan else x )
+            #else: self.datetime_data = pd.DataFrame()
         # self.non_numeric_data = pd.concat([self.datetime_data, self.string_data], axis=1)
+        self.datetime_data = self.datatime_convert()
         self.non_numeric_data = data[self.object_columns]
 
         self.numeric_profile_df = self.numeric_profile()
         self.non_numeric_profile_df = self.non_numeric_profile()
         self.total_profile_df = pd.concat([self.numeric_profile_df,self.non_numeric_profile_df], axis=1)
 
-
+    def datatime_convert(self):
+        '''
+            this function detects if there is any possible date-time format among the variables.
+            convert string variables in the data-time format to date-time type
+            :return: pd.Dataframe
+            '''
+        
+        if len(self.datetime_identification()) > 0:
+            res=pd.DataFrame(columns=self.datetime_columns)
+            print('Some date-time variables have been detected')
+            for j, x in enumerate(self.datetime_columns):
+                for i, y in enumerate(self.data.loc[:,x]):
+                    # print(i, i, x, y)
+                    try: res.loc[i,x] = parse(y)
+                    except: pass
+        else:
+            res = pd.DataFrame()
+            print('There is no date-time type variables')
+        
+        return res
 
     def datetime_identification(self) -> list:
         '''
