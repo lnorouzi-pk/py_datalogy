@@ -128,12 +128,17 @@ class EDA(object):
         '''
         # Running the data profiling part
         dp = DataProfiling(self.data, path=self.path)
-
+        # print('>>>>Object columns: ',dp.object_columns)
+        # print('>>>>>string columns: ',dp.string_columns)
+        # print('>>>>>date columns: ', dp.datetime_columns)
+        # print('>>>>>Non-numeric columns 0: ', dp.non_numeric_data.columns)
         df = dp.non_numeric_data
+
+        # print('>>>>>Non-numeric columns 1: ', df.columns)
 
         print(df.info(verbose=True))
         Non_NumericProfile = dp.non_numeric_profile_df
-        print('\n--------------Printing data descriptive information-------------- :\n', Non_NumericProfile)
+        print('\n--------------Printing data descriptive information: non-numeric-------------- :\n', Non_NumericProfile)
 
         if self.save_file:
             file_name = dp.path + 'data_profiling_non_numerical.xlsx'
@@ -197,7 +202,7 @@ class EDA(object):
         df = dp.numeric_data
         print(df.info(verbose=True))
         NumericProfile = dp.numeric_profile_df
-        print('\n--------------Printing data descriptive information-------------- :\n',NumericProfile)
+        print('\n--------------Printing data descriptive information: numeric-------------- :\n',NumericProfile)
 
         if self.save_file:
             file_name = self.path + 'data_profiling_numerical.xlsx'
@@ -263,6 +268,36 @@ class EDA(object):
                 self.non_numeric_eda()
             if ((len(dp.numerical_columns) > 0) & (len(dp.object_columns)>0)):
                 dp.total_profile_df.to_excel(writer, sheet_name='All_data_profile')
+                # Running data visualization part
+                # # plotting 6 graphs
+                # analyze_numeric(df, path=self.path)
+                # # plotting the correlation
+                # analyze_numeric_correlations(df, path=self.path)
+
+                # Running null analysis part
+                an = AnalyzeNulls(self.data , path=self.path)
+                # The location of the null values
+                # an.locations(save_pic=self.save_file)
+
+                print('\n\n--------------Correlation between varibales with null values--------------')
+                cor_btwn_nulls_df = an.cor_btwn_nulls(visual=self.visual, save_pic=self.save_file)
+                print(cor_btwn_nulls_df)
+
+
+
+                print('\n\n------------Correlation with varibales at the nulls location--------------')
+                corr_with_nulls_df = an.corr_with_nulls(visual=self.visual, save_pic=self.save_file)
+                print(corr_with_nulls_df)
+
+                print('\n\n------------boxplots by null--------------')
+                for x in list(self.data .columns):
+                    an.boxplots_by_null(var=x)
+
+                print('\n--------------null_combinations: Numeric variables--------------')
+                print(
+                    '\tSee which numeric variables are commonly null at the same time. A 1 denotes the column being null and a 0 denotes')
+                print('\tit having a value. Freq counts the number of rows with this pattern.\n\n')
+                print(an.null_combinations())
 
 
         return file_name

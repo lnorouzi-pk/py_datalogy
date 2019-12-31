@@ -101,7 +101,8 @@ class DataProfiling(object):
         if len(self.datetime_identification())>0:
             self.datetime_data = data[self.datetime_columns].applymap(lambda x: parse(x) if not x is np.nan else x )
         else: self.datetime_data = pd.DataFrame()
-        self.non_numeric_data = pd.concat([self.datetime_data, self.string_data], axis=1)
+        # self.non_numeric_data = pd.concat([self.datetime_data, self.string_data], axis=1)
+        self.non_numeric_data = data[self.object_columns]
 
         self.numeric_profile_df = self.numeric_profile()
         self.non_numeric_profile_df = self.non_numeric_profile()
@@ -179,7 +180,7 @@ class DataProfiling(object):
             prof.loc['LongestLength', col] = df.astype('str').str.len().max()
             prof.loc['LongestLengthVal', col] = df.astype('str').str.len().idxmax()
             prof.loc['ShortestLength', col] = df.astype('str').str.len().min()
-            prof.loc['ShortestLengthVal', col] = df.astype('str').str.len().idxmin()
+            prof.loc['ShortestLengthVal', col] = self.data.loc[df.astype('str').str.len().idxmin(),col]
             prof.loc['ShortestLengthNonNullVal', col] = df.dropna().astype('str').str.len().idxmin()
 
         return prof
@@ -246,7 +247,7 @@ class DataProfiling(object):
             prof.loc['LongestLength', col] = df.astype('str').str.len().max()
             prof.loc['LongestLengthVal', col] = df.astype('str').str.len().idxmax()
             prof.loc['ShortestLength', col] = df.astype('str').str.len().min()
-            prof.loc['ShortestLengthVal', col] = df.astype('str').str.len().idxmin()
+            prof.loc['ShortestLengthVal', col] = self.data.loc[df.astype('str').str.len().idxmin(),col]
             prof.loc['ShortestLengthNonNullVal', col] = df.dropna().astype('str').str.len().idxmin()
 
         return prof

@@ -75,6 +75,7 @@ class AnalyzeNulls(object):
         '''
         self.path = path
         self.data = data.copy(deep=True)
+        print(">>>>>>The data columns",data.columns)
         missing_columns_indexer = np.any(self.data.isnull(),axis = 0)
         self.missing_columns = self.data.columns[missing_columns_indexer]
         self.missing_data_df = self.data[self.missing_columns]
@@ -118,7 +119,7 @@ class AnalyzeNulls(object):
 
         plt.tight_layout()
 
-        fig_name = self.path+'Nulls_location.png'
+        fig_name = self.path+'Nulls_location_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
         if save_pic: fig.savefig(fig_name, dpi=100)
         plt.show()
         plt.close(fig)
@@ -139,30 +140,47 @@ class AnalyzeNulls(object):
 
         :return: c: pd.DataFrame -- Correlation between nulls.
         """
-        null_locations = self.missing_data_df.isnull()
-        null_locations.columns = null_locations.columns
-        corr_data = null_locations.corr()
+        corr_data = pd.DataFrame()
 
-        if visual :
-            fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
-            g = sns.heatmap(corr_data,
-                        mask=np.zeros_like(corr_data, dtype=np.bool),
-                        cmap=sns.diverging_palette(20, 220, as_cmap=True),
-                        vmin=-1, vmax=1,
-                        square=True,
-                        ax=ax)
-            ax.set_title('Correlation between nulls\n\n', fontsize='large')
-            ax.set_xlabel('Column names')
-            ax.set_ylabel('Column names')
-            g.set_yticklabels(g.get_yticklabels(), rotation=0)
+        # print('>>>>>>If plot Correlation between nulls:',self.missing_data_df.isnull().any().sum() )
+        if self.missing_data_df.isnull().any().sum()>1:
+            null_locations = self.missing_data_df.isnull()
+            null_locations.columns = null_locations.columns
+            # print('>>>>>Null location columns: ', null_locations.columns)
 
-            # plt.tight_layout()
+            corr_data = null_locations.corr()
 
-            fig_name = self.path+'cor_btwn_nulls.png'
-            if save_pic: fig.savefig(fig_name, dpi=100)
+            if visual :
+                fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
+                g = sns.heatmap(corr_data,
+                            mask=np.zeros_like(corr_data, dtype=np.bool),
+                            cmap=sns.diverging_palette(20, 220, as_cmap=True),
+                            vmin=-1, vmax=1,
+                            square=True,
+                            ax=ax)
+                ax.set_title('Correlation between nulls\n\n', fontsize='large')
+                ax.set_xlabel('Column names')
+                ax.set_ylabel('Column names')
+                g.set_yticklabels(g.get_yticklabels(), rotation=0)
+                fig_name = self.path+'cor_btwn_nulls_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
+                if save_pic: fig.savefig(fig_name, dpi=100)
 
-            plt.show()
-            plt.close(fig)
+                plt.show()
+                plt.close(fig)
+        else:
+            # print('>>>>>>>>>>>>>>>>>>>>>THIS FOR CHECKING EMPTY ')
+            if visual:
+                fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
+                plt.text(0.5, 0.5, 'No missing value in more than 2 variables for\n%s'%(
+                    ' '.join(i for i in self.data.columns.to_list())), ha='center')
+                ax.set_title('Correlation between nulls\n\n', fontsize='large')
+                ax.set_xlabel('Column names')
+                ax.set_ylabel('Column names')
+                fig_name = self.path + 'cor_btwn_nulls_' + ''.join(i[0].upper() for i in self.data.columns) + '.png'
+                if save_pic: fig.savefig(fig_name, dpi=100)
+                plt.show()
+                plt.close(fig)
+
 
         return corr_data
 
@@ -194,24 +212,40 @@ class AnalyzeNulls(object):
         data_with_null_indicators = pd.concat([null_indicators, self.data], axis=1)
         correlations = data_with_null_indicators.corr()
         correlations = correlations.iloc[n_indicators:,:n_indicators]
+        # print(">>>>>>>>>>to check with nulls: %d \ncorrelations: %d"%(n_indicators,len(correlations)))
+        # print(correlations)
+        # print(self.data.columns)
+        # print('<<<<<<<<<<<<<<<<<')
+        if not correlations.empty:
+            if visual :
+                fig, ax = plt.subplots(figsize=(17, 8), constrained_layout=True)
+                g = sns.heatmap(correlations,
+                            mask=np.zeros_like(correlations, dtype=np.bool),
+                            vmin=-1, vmax=1, center= 0.5,
+                            # square=True,
+                            ax=ax)
+                ax.set_title('Correlation between nulls and variables\n\n', fontsize='large')
+                ax.set_xlabel('Column names')
+                ax.set_ylabel('Column names')
+                g.set_yticklabels(g.get_yticklabels(), rotation=0)
 
-        if visual :
-            fig, ax = plt.subplots(figsize=(17, 8), constrained_layout=True)
-            g = sns.heatmap(correlations,
-                        mask=np.zeros_like(correlations, dtype=np.bool),
-                        vmin=-1, vmax=1, center= 0.5,
-                        # square=True,
-                        ax=ax)
-            ax.set_title('Correlation between nulls and variables\n\n', fontsize='large')
-            ax.set_xlabel('Column names')
-            ax.set_ylabel('Column names')
-            g.set_yticklabels(g.get_yticklabels(), rotation=0)
+                fig_name = self.path+'corr_with_nulls_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
+                if save_pic: fig.savefig(fig_name, dpi=100)
 
-            fig_name = self.path+'corr_with_nulls.png'
-            if save_pic: fig.savefig(fig_name, dpi=100)
-
-            plt.show()
-            plt.close(fig)
+                plt.show()
+                plt.close(fig)
+        else:
+            if visual:
+                fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
+                plt.text(0.5, 0.5, 'No missing value in any variables \ncoincide with a numeric variable for\n%s'%(
+                    ' '.join(i for i in self.data.columns.to_list())), ha='center')
+                ax.set_title('Correlation between nulls and variables\n\n', fontsize='large')
+                ax.set_xlabel('Column names')
+                ax.set_ylabel('Column names')
+                fig_name = self.path + 'cor_btwn_nulls_' + ''.join(i[0].upper() for i in self.data.columns) + '.png'
+                if save_pic: fig.savefig(fig_name, dpi=100)
+                plt.show()
+                plt.close(fig)
 
         return correlations
 
@@ -281,7 +315,7 @@ class AnalyzeNulls(object):
 
         fig.suptitle(f'Boxplots grouped by whether {var} is null')
 
-        fig_name = self.path+'boxplots_by_null.png'
+        fig_name = self.path+'boxplots_by_null_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
         if save_pic: fig.savefig(fig_name, dpi=100)
 
         plt.show()

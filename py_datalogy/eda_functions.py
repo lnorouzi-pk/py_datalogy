@@ -28,7 +28,7 @@
 
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
-from pandas.api.types import is_string_dtype
+from pandas.api.types import is_string_dtype, is_object_dtype
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -189,7 +189,9 @@ def analyze_cat(df,save_pic=True, path='') -> None:
 
     :return: None, a plot.
     '''
-    obj_cols = [cols for cols in df.columns if is_string_dtype(df[cols]) and len(df[cols].dropna()) > 0]
+    obj_cols = [cols for cols in df.columns if is_object_dtype(df[cols]) and len(df[cols].dropna()) > 0]
+
+    print('These are non numeric columns\n',obj_cols)
 
     # For each object column in the list
     for x, col_name in enumerate(obj_cols):
