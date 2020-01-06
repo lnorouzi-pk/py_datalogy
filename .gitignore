@@ -3,3 +3,4 @@ shphinx/_buid
 .DS_Store
 .idea
 notes.txt
+py_datalogy/tests

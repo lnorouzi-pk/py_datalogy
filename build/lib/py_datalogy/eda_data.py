@@ -6,17 +6,22 @@ It also generates data profiling as a excel file, Null analysis results and data
 
 import pandas as pd
 # import numpy as np
+from os.path import dirname, abspath, join
+import sys
+
+# Find code directory relative to our directory
+THIS_DIR = dirname(__file__)
+CODE_DIR = abspath(join(THIS_DIR, '..', 'code'))
+sys.path.append(CODE_DIR)
+
 import os
 import warnings
 
-import sys
-dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(dir_path)
 
 
-from data_profiling import *
-from eda_functions import *
-from analyze_nulls import *
+# from data_profiling import *
+# from eda_functions import *
+# from analyze_nulls import *
 
 #To ignore warning while running the code
 warnings.filterwarnings("ignore")
@@ -108,13 +113,9 @@ class EDA(object):
         self.data = data
         if path!='':
             try:
-                print('The path exist')
                 os.stat(path)
             except:
-
-
-                print("The path doesn't exist , creating path", path)
-                os.makedirs(path)
+                os.mkdir(path)
 
         self.path = path
 
