@@ -63,7 +63,7 @@ class AnalyzeNulls(object):
 
 
     """
-    def __init__(self, data: pd.DataFrame, path=''):
+    def __init__(self, data: pd.DataFrame, visual=True, save_pic=True, path=''):
         '''
 
         :param data: teh data to be investigated
@@ -75,13 +75,15 @@ class AnalyzeNulls(object):
         '''
         self.path = path
         self.data = data.copy(deep=True)
-        print(">>>>>>The data columns",data.columns)
+        self.visual = visual
+        self.save_pic = save_pic
+
         missing_columns_indexer = np.any(self.data.isnull(),axis = 0)
         self.missing_columns = self.data.columns[missing_columns_indexer]
         self.missing_data_df = self.data[self.missing_columns]
         self.null_indicators = self.missing_data_df.isnull()
 
-    def locations(self, save_pic=True) -> None:
+    def locations(self) -> None:
 
         """
         See where in data missing values are located. Nulls are shown in white.
@@ -91,44 +93,47 @@ class AnalyzeNulls(object):
 
         :return: None
         """
-        fig = plt.figure(figsize= (15,8))
-        main_ax = plt.subplot2grid((8, 20), (0, 0), colspan=19, rowspan= 8)
-        legend_ax = plt.subplot2grid((8, 20), (5, 19), colspan=1,rowspan=1)
+        if self.visual:
+            print('***********Plotting null location*************',self.visual)
+            fig = plt.figure(figsize= (15,8))
+            main_ax = plt.subplot2grid((8, 20), (0, 0), colspan=19, rowspan= 8)
+            legend_ax = plt.subplot2grid((8, 20), (5, 19), colspan=1,rowspan=1)
 
-        value_to_int = {j: i for i, j in enumerate([0, 1])}
+            value_to_int = {j: i for i, j in enumerate([0, 1])}
 
-        g = sns.heatmap(self.data.isnull().transpose(),vmax=1, vmin= 0, center=0.5,ax=main_ax, cmap="Reds", cbar=False)
-        g.set_yticklabels(g.get_yticklabels(), rotation=0)
+            g = sns.heatmap(self.data.isnull().transpose(),vmax=1, vmin= 0, center=0.5,ax=main_ax, cmap="Reds", cbar=False)
+            g.set_yticklabels(g.get_yticklabels(), rotation=0)
 
-        main_ax.set_title("Missing values' locations\n",fontsize='large')
-        main_ax.set_xlabel('Index')
-        main_ax.set_ylabel('Column names')
+            main_ax.set_title("Missing values' locations\n",fontsize='large')
+            main_ax.set_xlabel('Index')
+            main_ax.set_ylabel('Column names')
 
-        legend_ax.axis('off')
+            legend_ax.axis('off')
 
-        # reconstruct color map
-        colors = plt.cm.Reds(np.linspace(0, 1, len(value_to_int)))
+            # reconstruct color map
+            colors = plt.cm.Reds(np.linspace(0, 1, len(value_to_int)))
 
-        # add color map to legend
-        patches = [mpatches.Patch(facecolor=c, edgecolor=c) for c in colors]
-        legend = legend_ax.legend(patches,
-                                  ['Non-nulls','Nulls'],
-                                  handlelength=0.9, loc='lower left')
-        for t in legend.get_texts():
-            t.set_ha("left")
+            # add color map to legend
+            patches = [mpatches.Patch(facecolor=c, edgecolor=c) for c in colors]
+            legend = legend_ax.legend(patches,
+                                      ['Non-nulls','Nulls'],
+                                      handlelength=0.9, loc='lower left')
+            for t in legend.get_texts():
+                t.set_ha("left")
 
-        plt.tight_layout()
+            plt.tight_layout()
 
-        fig_name = self.path+'Nulls_location_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
-        if save_pic: fig.savefig(fig_name, dpi=100)
-        plt.show()
-        plt.close(fig)
-
+            fig_name = self.path+'Nulls_location_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
+            if self.save_pic: fig.savefig(fig_name, dpi=100)
+            plt.show()
+            plt.close(fig)
+        else:
+            print('**********No Null location will be plotted**********')
         pass
 
 
 
-    def cor_btwn_nulls(self, visual=True, save_pic=True) -> pd.DataFrame:
+    def cor_btwn_nulls(self) -> pd.DataFrame:
         """
         See which columns's nulls are correlated to which other column's nulls. E.g. if Var A and Var B are null
         for all the same rows, they will have correlation 1.
@@ -150,7 +155,7 @@ class AnalyzeNulls(object):
 
             corr_data = null_locations.corr()
 
-            if visual :
+            if self.visual :
                 fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
                 g = sns.heatmap(corr_data,
                             mask=np.zeros_like(corr_data, dtype=np.bool),
@@ -163,13 +168,15 @@ class AnalyzeNulls(object):
                 ax.set_ylabel('Column names')
                 g.set_yticklabels(g.get_yticklabels(), rotation=0)
                 fig_name = self.path+'cor_btwn_nulls_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
-                if save_pic: fig.savefig(fig_name, dpi=100)
+                if self.save_pic: fig.savefig(fig_name, dpi=100)
 
                 plt.show()
                 plt.close(fig)
+            else:
+                print('**********No Null correlation will be plotted**********')
         else:
             # print('>>>>>>>>>>>>>>>>>>>>>THIS FOR CHECKING EMPTY ')
-            if visual:
+            if self.visual:
                 fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
                 plt.text(0.5, 0.5, 'No missing value in more than 2 variables for\n%s'%(
                     ' '.join(i for i in self.data.columns.to_list())), ha='center')
@@ -177,14 +184,16 @@ class AnalyzeNulls(object):
                 ax.set_xlabel('Column names')
                 ax.set_ylabel('Column names')
                 fig_name = self.path + 'cor_btwn_nulls_' + ''.join(i[0].upper() for i in self.data.columns) + '.png'
-                if save_pic: fig.savefig(fig_name, dpi=100)
+                if self.save_pic: fig.savefig(fig_name, dpi=100)
                 plt.show()
                 plt.close(fig)
+            else:
+                print('**********No Null correlation will be plotted**********')
 
 
         return corr_data
 
-    def corr_with_nulls(self, visual=True, save_pic=True) -> pd.DataFrame:
+    def corr_with_nulls(self) -> pd.DataFrame:
         """
         See which columns have correlation with a variable being null. The rows correspond to a variable and the columns
         are an indicator for whether a variable is null. E.g. the data at left would result in the following table
@@ -217,7 +226,7 @@ class AnalyzeNulls(object):
         # print(self.data.columns)
         # print('<<<<<<<<<<<<<<<<<')
         if not correlations.empty:
-            if visual :
+            if self.visual :
                 fig, ax = plt.subplots(figsize=(17, 8), constrained_layout=True)
                 g = sns.heatmap(correlations,
                             mask=np.zeros_like(correlations, dtype=np.bool),
@@ -230,12 +239,14 @@ class AnalyzeNulls(object):
                 g.set_yticklabels(g.get_yticklabels(), rotation=0)
 
                 fig_name = self.path+'corr_with_nulls_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
-                if save_pic: fig.savefig(fig_name, dpi=100)
+                if self.save_pic: fig.savefig(fig_name, dpi=100)
 
                 plt.show()
                 plt.close(fig)
+            else:
+                print('**********No Null correlation will be plotted**********')
         else:
-            if visual:
+            if self.visual:
                 fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
                 plt.text(0.5, 0.5, 'No missing value in any variables \ncoincide with a numeric variable for\n%s'%(
                     ' '.join(i for i in self.data.columns.to_list())), ha='center')
@@ -243,9 +254,11 @@ class AnalyzeNulls(object):
                 ax.set_xlabel('Column names')
                 ax.set_ylabel('Column names')
                 fig_name = self.path + 'cor_btwn_nulls_' + ''.join(i[0].upper() for i in self.data.columns) + '.png'
-                if save_pic: fig.savefig(fig_name, dpi=100)
+                if self.save_pic: fig.savefig(fig_name, dpi=100)
                 plt.show()
                 plt.close(fig)
+            else:
+                print('**********No Null correlation will be plotted**********')
 
         return correlations
 
@@ -286,7 +299,7 @@ class AnalyzeNulls(object):
 
         return patterns
 
-    def boxplots_by_null(self, var: str, save_pic=True):
+    def boxplots_by_null(self,var: str):
         """
         View distribution in variables, split based on whether the observation has var null.
 
@@ -298,31 +311,35 @@ class AnalyzeNulls(object):
         :return: None
 
         """
-        if type(var) is not str:
-            raise TypeError("Var must be string")
-
-        boxplot_df = self.data.copy(deep = True)
+        boxplot_df = self.data.copy(deep=True)
         boxplot_df[f'{var}_is_null'] = boxplot_df[var].isnull()
         boxplot_df = boxplot_df.drop(var, axis=1)
         number_of_numeric_col = boxplot_df.select_dtypes(include=[np.number]).shape[1]
-        fig, axes = plt.subplots(ncols=number_of_numeric_col, figsize = (17,8))
-        boxplot_df.boxplot(by=f'{var}_is_null', return_type='axes', ax=axes)
+        if ((self.visual) & (number_of_numeric_col>0)):
 
-        if number_of_numeric_col >1 :
-            for x in axes:
-                x.set_xlabel(var+' is null')
-        else: axes.set_xlabel(var+' is null')
+            if type(var) is not str:
+                raise TypeError("Var must be string")
 
-        fig.suptitle(f'Boxplots grouped by whether {var} is null')
+            fig, axes = plt.subplots(ncols=number_of_numeric_col, figsize = (17,8))
+            boxplot_df.boxplot(by=f'{var}_is_null', return_type='axes', ax=axes)
 
-        fig_name = self.path+'boxplots_by_null_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
-        if save_pic: fig.savefig(fig_name, dpi=100)
+            if number_of_numeric_col >1 :
+                for x in axes:
+                    x.set_xlabel(var+' is null')
+            else: axes.set_xlabel(var+' is null')
 
-        plt.show()
-        plt.close(fig)
+            fig.suptitle(f'Boxplots grouped by whether {var} is null')
+
+            fig_name = self.path+'boxplots_by_null_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
+            if self.save_pic: fig.savefig(fig_name, dpi=100)
+
+            plt.show()
+            plt.close(fig)
+        else:
+            print('**********No boxplot will be plotted**********')
         pass
 
-    def pairwise_null_comparison(self, x: str, y: str) -> None:
+    def pairwise_null_comparison(self,  x: str, y: str) -> None:
         """
         View a scatter plot showing x vs. y. For variables where x is missing, show a heatmap of their distribution
         in y, and vice versa.

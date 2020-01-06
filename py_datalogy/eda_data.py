@@ -11,6 +11,7 @@ import os
 import warnings
 
 
+
 from data_profiling import *
 from eda_functions import *
 from analyze_nulls import *
@@ -18,10 +19,13 @@ from analyze_nulls import *
 #To ignore warning while running the code
 warnings.filterwarnings("ignore")
 
+
 # the log file name
 filename= 'outputlog.txt'
 # To write the python console outputs in a text file, to save the records if it is needed.
-sys.stdout = open(os.getcwd()+'/outputlog.txt', 'w')
+
+
+
 
 class EDA(object):
     """
@@ -87,7 +91,7 @@ class EDA(object):
 
     """
 
-    def __init__(self, data:pd.DataFrame, path='' ,save_file=True, visual=True):
+    def __init__(self, data:pd.DataFrame, path='' ,save_file=True, visual=True, log_file=True):
         '''
 
         :param data: The data to be investigated.
@@ -110,6 +114,10 @@ class EDA(object):
 
         self.save_file= save_file
         self.visual = visual
+        self.log_file = log_file
+
+        if self.log_file: sys.stdout = open(os.getcwd()+'/outputlog.txt', 'w')
+        print('This is the log_file',self.log_file)
 
     def non_numeric_eda(self) -> None:
         '''
@@ -149,19 +157,19 @@ class EDA(object):
 
         # Running data visualization part
         # plotting the distribution
-        analyze_cat(df, path=self.path)
+        analyze_cat(df, path=self.path, visual= self.visual)
 
         # Running null analysis part
-        an = AnalyzeNulls(df, path=self.path)
+        an = AnalyzeNulls(df, path=self.path, visual= self.visual)
         # The location of the null values
         an.locations()
 
         print('\n\n--------------Correlation between variables with null values--------------')
-        cor_btwn_nulls_df = an.cor_btwn_nulls(visual=self.visual, save_pic=self.save_file)
+        cor_btwn_nulls_df = an.cor_btwn_nulls()
         print(cor_btwn_nulls_df)
 
         print('\n\n------------Correlation with variables at the nulls location--------------')
-        corr_with_nulls_df = an.corr_with_nulls(visual=self.visual, save_pic=self.save_file)
+        corr_with_nulls_df = an.corr_with_nulls()
         print(corr_with_nulls_df)
 
         print('\n--------------null_combinations: Non_numeric variables--------------')
@@ -213,26 +221,27 @@ class EDA(object):
 
         # Running data visualization part
         # plotting 6 graphs
-        analyze_numeric(df, path=self.path)
+        analyze_numeric(df, path=self.path, visual= self.visual)
         # plotting the correlation
-        analyze_numeric_correlations(df, path=self.path)
+        analyze_numeric_correlations(df, path=self.path, visual= self.visual)
 
         # Running null analysis part
-        an = AnalyzeNulls(df, path=self.path)
+        an = AnalyzeNulls(df, path=self.path, visual= self.visual)
         # The location of the null values
-        an.locations(save_pic=self.save_file)
+        an.locations()
 
         print('\n\n--------------Correlation between varibales with null values--------------')
-        cor_btwn_nulls_df = an.cor_btwn_nulls(visual=self.visual, save_pic=self.save_file)
+        cor_btwn_nulls_df = an.cor_btwn_nulls()
         print(cor_btwn_nulls_df)
 
         print('\n\n------------Correlation with varibales at the nulls location--------------')
-        corr_with_nulls_df= an.corr_with_nulls(visual=self.visual, save_pic=self.save_file)
+        corr_with_nulls_df= an.corr_with_nulls()
         print(corr_with_nulls_df)
 
         print('\n\n------------boxplots by null--------------')
         for x in list(df.columns):
-            an.boxplots_by_null(var=x)
+            if len(list(df.columns)) >1: an.boxplots_by_null(var=x)
+            else: print('There is only one variable: No boxplots by null will be plotted in numeric variables')
 
         print('\n--------------null_combinations: Numeric variables--------------')
         print('\tSee which numeric variables are commonly null at the same time. A 1 denotes the column being null and a 0 denotes')
@@ -257,16 +266,25 @@ class EDA(object):
               %(len(dp.numerical_columns) > 0 , len(dp.object_columns)>0))
         file_name = self.path+'data_profiling_total.xlsx'
         print('Output data profiling will be saved in :' ,file_name)
-        print('\n--------------Saving data descriptive information in %s-------------- :\n' % (file_name))
+        print(
+            'Plotting the results: %s\nSaving the results: %s\nSaving the log: %s'%(
+            self.visual,self.save_file,self.log_file)
+            )
+
+        print(self.data.info(verbose=True))
+
         with pd.ExcelWriter(file_name) as writer:  # doctest: +SKIP
-            print('The data profiling results is saved in %s \n'%(file_name))
+
             if len(dp.numerical_columns) > 0:
+                print('>>> NUMERIC VARIABLES <<<\n*********************************')
                 dp.numeric_profile_df.to_excel(writer, sheet_name='Numerical_data_profile')
                 self.numeric_eda()
             if len(dp.object_columns)>0 :
+                print('>>> NON-NUMERIC VARIABLES <<<\n*********************************')
                 dp.non_numeric_profile_df.to_excel(writer, sheet_name='Non-numerical_data_profile')
                 self.non_numeric_eda()
             if ((len(dp.numerical_columns) > 0) & (len(dp.object_columns)>0)):
+                print('>>> ALL VARIABLES <<<\n*********************************')
                 dp.total_profile_df.to_excel(writer, sheet_name='All_data_profile')
                 # Running data visualization part
                 # # plotting 6 graphs
@@ -275,23 +293,24 @@ class EDA(object):
                 # analyze_numeric_correlations(df, path=self.path)
 
                 # Running null analysis part
-                an = AnalyzeNulls(self.data , path=self.path)
+                an = AnalyzeNulls(self.data , path=self.path, visual=self.visual)
                 # The location of the null values
                 # an.locations(save_pic=self.save_file)
 
                 print('\n\n--------------Correlation between varibales with null values--------------')
-                cor_btwn_nulls_df = an.cor_btwn_nulls(visual=self.visual, save_pic=self.save_file)
+                cor_btwn_nulls_df = an.cor_btwn_nulls()
                 print(cor_btwn_nulls_df)
 
 
 
                 print('\n\n------------Correlation with varibales at the nulls location--------------')
-                corr_with_nulls_df = an.corr_with_nulls(visual=self.visual, save_pic=self.save_file)
+                corr_with_nulls_df = an.corr_with_nulls()
                 print(corr_with_nulls_df)
 
                 print('\n\n------------boxplots by null--------------')
-                for x in list(self.data .columns):
-                    an.boxplots_by_null(var=x)
+                for x in list(self.data.columns):
+                    if len(list(self.data.columns))>1: an.boxplots_by_null(var=x)
+                    else: print('There is only one variable: No boxplots by null will be plotted in total variables')
 
                 print('\n--------------null_combinations: Numeric variables--------------')
                 print(

@@ -1,0 +1,379 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>data_profiling &#8212; EDA library 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for data_profiling</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+
+
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">dateutil.parser</span> <span class="k">import</span> <span class="o">*</span>
+<span class="c1"># from eda_functions import *</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="DataProfiling"><a class="viewcode-back" href="../code.html#data_profiling.DataProfiling">[docs]</a><span class="k">class</span> <span class="nc">DataProfiling</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :Author: Leila Norouzi</span>
+<span class="sd">    :Date: 27 Dec 2019</span>
+<span class="sd">    :Description:</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: pd.DataFrame -- The data to be investigated</span>
+<span class="sd">    path: str -- The path for saving the results</span>
+<span class="sd">    numerical_columns: list -- The name of the numeric variables (columns) in the data</span>
+<span class="sd">    object_columns: list -- The name of the non-numeric variables (columns) in the data</span>
+<span class="sd">    datetime_columns: list -- The name of the date-time type variables (columns) in the data</span>
+<span class="sd">    string_columns: list -- The name of the string type variables (columns) in the data</span>
+<span class="sd">    numeric_data: pd.DataFrame -- The numeric variables (columns) of the data</span>
+<span class="sd">    string_data: pd.DataFrame -- The string type variables (columns) of the data</span>
+<span class="sd">    datetime_data: pd.DataFrame -- The date-time type variables (columns) of the data</span>
+<span class="sd">    non_numeric_data: pd.DataFrame -- The non-numeric variables (columns) of the data</span>
+<span class="sd">    numeric_profile_df: pd.DataFrame -- The data profile for numeric variables (columns)</span>
+<span class="sd">    non_numeric_profile_df: pd.DataFrame -- The data profile for non-numeric variables (columns)</span>
+<span class="sd">    total_profile_df: pd.DataFrame -- The data profile for all variables (columns)</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    --------</span>
+<span class="sd">    datetime_identification: This functions looks at the non-numeric columns od the data and search if they have any</span>
+<span class="sd">        date/time format. Then returns the name of those columns.</span>
+<span class="sd">    numeric_profile: This function takes the numeric variables of the data and for each variable generates a basic data</span>
+<span class="sd">        description such as</span>
+<span class="sd">            - The type of the variable as numeric, the size of the data,</span>
+<span class="sd">            - The max, min, mean, median, standard deviation  and the range of the variable,</span>
+<span class="sd">            - Number of nulls, non-nulls and percentage of null values,</span>
+<span class="sd">            - The unique values , number of unique values and their frequency counts</span>
+<span class="sd">            - The longest and shortest length of the string version of values and their values, and the shortest length</span>
+<span class="sd">             of the non-null value for each variable.</span>
+<span class="sd">            - The top frequent value and the count is set to NA as they are set for non-numeric variables</span>
+
+<span class="sd">    non_numeric_profile: This function takes the non-numeric variables of the data and for each variable generates a</span>
+<span class="sd">        basic data description such as</span>
+<span class="sd">            - The type of the variable as non-numeric, the size of the data,</span>
+<span class="sd">            - The max and min values as teh first  and the last values when the variable is sorted</span>
+<span class="sd">            - The median, standard deviation  and the range of the variable are set to NA</span>
+<span class="sd">            - Number of nulls, non-nulls and percentage of null values,</span>
+<span class="sd">            - The unique values , number of unique values and their frequency counts</span>
+<span class="sd">            - The longest and shortest length of values and their values, and the shortest length of the non-null</span>
+<span class="sd">              value for each variable.</span>
+<span class="sd">            - The top most frequent value and the count</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :Description: This functions looks at the non-numeric columns od the data and search if they have any</span>
+<span class="sd">            date/time format. Then returns the name of those columns.</span>
+
+<span class="sd">        :param data: The data to be investigated.</span>
+<span class="sd">        :type data: pandas dataframe</span>
+<span class="sd">        :param path: the path to save the plot in.</span>
+<span class="sd">        :type path: str</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="c1"># self.features =list(data.columns)</span>
+
+        <span class="c1"># Identifying the columns with numerical type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numerical_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">cols</span> <span class="k">for</span> <span class="n">cols</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+                                   <span class="k">if</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">])</span>
+                                   <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                                   <span class="ow">and</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                                   <span class="p">]</span>
+        <span class="c1">#Identifying the columns with object type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">cols</span> <span class="k">for</span> <span class="n">cols</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+                                   <span class="k">if</span> <span class="n">is_object_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">])</span>
+                                   <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                                   <span class="ow">and</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                                   <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">datetime_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datetime_identification</span><span class="p">()</span>
+        <span class="c1"># self.string_columns = list(</span>
+        <span class="c1">#     filter(</span>
+        <span class="c1">#         lambda x: x not in set(self.datetime_identification()), self.object_columns</span>
+        <span class="c1">#     ))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">numeric_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">numerical_columns</span><span class="p">]</span>
+        <span class="c1"># self.string_data = data[self.string_columns]</span>
+            <span class="c1">#if len(self.datetime_identification())&gt;0:</span>
+            <span class="c1">#self.datetime_data = data[self.datetime_columns].applymap(lambda x: parse(x) if not x is np.nan else x )</span>
+            <span class="c1">#else: self.datetime_data = pd.DataFrame()</span>
+        <span class="c1"># self.non_numeric_data = pd.concat([self.datetime_data, self.string_data], axis=1)</span>
+        <span class="c1"># self.datetime_data = self.datatime_convert()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_numeric_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">object_columns</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">numeric_profile_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_profile</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_numeric_profile_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_numeric_profile</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_profile_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">numeric_profile_df</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">non_numeric_profile_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataProfiling.datatime_convert"><a class="viewcode-back" href="../code.html#data_profiling.DataProfiling.datatime_convert">[docs]</a>    <span class="k">def</span> <span class="nf">datatime_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            this function detects if there is any possible date-time format among the variables.</span>
+<span class="sd">            convert string variables in the data-time format to date-time type</span>
+<span class="sd">            :return: pd.Dataframe</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime_identification</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime_columns</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Some date-time variables have been detected&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime_columns</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">x</span><span class="p">]):</span>
+                    <span class="c1"># print(i, i, x, y)</span>
+                    <span class="k">try</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;There is no date-time type variables&#39;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="DataProfiling.datetime_identification"><a class="viewcode-back" href="../code.html#data_profiling.DataProfiling.datetime_identification">[docs]</a>    <span class="k">def</span> <span class="nf">datetime_identification</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :Description: This functions looks at the non-numeric columns od the data and search if they have any</span>
+<span class="sd">        date/time format. Then returns the name of those columns.</span>
+
+<span class="sd">        :return :  list --  date-time column names</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">res</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_columns</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+            <span class="c1"># to check if the content of teh column is date-time type or not</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">parse</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">res</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="DataProfiling.numeric_profile"><a class="viewcode-back" href="../code.html#data_profiling.DataProfiling.numeric_profile">[docs]</a>    <span class="k">def</span> <span class="nf">numeric_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :Description: This function takes the numeric variables of the data and for each variable generates a basic data</span>
+<span class="sd">        description such as</span>
+<span class="sd">            - The type of the variable as numeric, the size of the data,</span>
+<span class="sd">            - The max, min, mean, median, standard deviation  and the range of the variable,</span>
+<span class="sd">            - Number of nulls, non-nulls and percentage of null values,</span>
+<span class="sd">            - The unique values , number of unique values and their frequency counts</span>
+<span class="sd">            - The longest and shortest length of the string version of values and their values, and the shortest length</span>
+<span class="sd">             of the non-null value for each variable.</span>
+<span class="sd">            - The top frequent value and the count is set to NA as they are set for non-numeric variables</span>
+
+<span class="sd">        :return: pd.DataFrame --  A descriptive information about numerical variables of the data</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1">#Making a profile data frame</span>
+        <span class="n">prof</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">numerical_columns</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">col</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">get_dtype_counts</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Size&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;MaxValue&#39;</span><span class="p">,</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;MinValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Top&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Freq&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;MeanValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;MedianValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">median</span><span class="p">(),</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ModeValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">mode</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;StdValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">df</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Range&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">df</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;NumNull&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;NonNull&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;PercentNull&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+            <span class="c1"># Calculate the 25, 75 and 95 percentiles of the values</span>
+            <span class="c1"># prof.loc[&#39;q25&#39;, col] = np.percentile(df.dropna(), 25)</span>
+            <span class="c1"># prof.loc[&#39;q75&#39;, col] = np.percentile(df.dropna(), 75)</span>
+            <span class="c1"># prof.loc[&#39;q95&#39;, col] = np.percentile(df.dropna(), 95)</span>
+
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;UniqueValues&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;NumUnique&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+
+            <span class="n">hist</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;num&#39;</span><span class="p">])</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ValueFreq&#39;</span><span class="p">,</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;LongestLength&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;LongestLengthVal&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(),</span><span class="n">col</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ShortestLength&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ShortestLengthVal&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">idxmin</span><span class="p">(),</span><span class="n">col</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ShortestLengthNonNullVal&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">prof</span></div>
+
+<div class="viewcode-block" id="DataProfiling.non_numeric_profile"><a class="viewcode-back" href="../code.html#data_profiling.DataProfiling.non_numeric_profile">[docs]</a>    <span class="k">def</span> <span class="nf">non_numeric_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :Description: This function takes the non-numeric variables of the data and for each variable generates a</span>
+<span class="sd">        basic data description such as</span>
+<span class="sd">            - The type of the variable as non-numeric, the size of the data,</span>
+<span class="sd">            - The max and min values as teh first  and the last values when the variable is sorted</span>
+<span class="sd">            - The median, standard deviation  and the range of the variable are set to NA</span>
+<span class="sd">            - Number of nulls, non-nulls and percentage of null values,</span>
+<span class="sd">            - The unique values , number of unique values and their frequency counts</span>
+<span class="sd">            - The longest and shortest length of values and their values, and the shortest length of the non-null</span>
+<span class="sd">              value for each variable.</span>
+<span class="sd">            - The top most frequent value and the count</span>
+
+<span class="sd">        :return: pd.DataFrame -- A descriptive information about non-numerical variables of the data</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1">#Making a profile data frame</span>
+        <span class="n">prof</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_columns</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">col</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">get_dtype_counts</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Size&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;MaxValue&#39;</span><span class="p">,</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;MinValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">hist</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+                                    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+                                    <span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;num&#39;</span><span class="p">])</span>
+
+            <span class="c1"># prof.loc[&#39;MeanValue&#39;, col] = hist.num.mean()</span>
+            <span class="c1"># prof.loc[&#39;MedianValue&#39;, col] = hist.num.median()</span>
+            <span class="c1"># prof.loc[&#39;ModeValue&#39;, col] = hist.num.mode()[0]</span>
+            <span class="c1"># prof.loc[&#39;StdValue&#39;, col] = np.std(hist.num)</span>
+            <span class="c1"># prof.loc[&#39;Range&#39;, col] = [prof.loc[&#39;MinValue&#39;, col],prof.loc[&#39;MaxValue&#39;,col]]</span>
+
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Top&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Freq&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;num&#39;</span><span class="p">]</span>
+
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;MeanValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;MedianValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ModeValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;StdValue&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Range&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NA&#39;</span>
+
+
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;NumNull&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;NonNull&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">|</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;PercentNull&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+            <span class="c1"># Calculate the 25, 75 and 95 percentiles of the values</span>
+            <span class="c1"># prof.loc[&#39;q25&#39;, col] = &#39;NA&#39;</span>
+            <span class="c1"># prof.loc[&#39;q75&#39;, col] = &#39;NA&#39;</span>
+            <span class="c1"># prof.loc[&#39;q95&#39;, col] = &#39;NA&#39;</span>
+
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;UniqueValues&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;NumUnique&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ValueFreq&#39;</span><span class="p">,</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;LongestLength&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;LongestLengthVal&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(),</span><span class="n">col</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ShortestLength&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ShortestLengthVal&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">idxmin</span><span class="p">(),</span><span class="n">col</span><span class="p">]</span>
+            <span class="n">prof</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;ShortestLengthNonNullVal&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">prof</span></div></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EDA library</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">code documentation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Leila Norouzi.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -46,6 +46,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 
+
 <span class="kn">from</span> <span class="nn">data_profiling</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">eda_functions</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">analyze_nulls</span> <span class="k">import</span> <span class="o">*</span>
@@ -53,10 +54,13 @@
 <span class="c1">#To ignore warning while running the code</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
+
 <span class="c1"># the log file name</span>
 <span class="n">filename</span><span class="o">=</span> <span class="s1">&#39;outputlog.txt&#39;</span>
 <span class="c1"># To write the python console outputs in a text file, to save the records if it is needed.</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;/outputlog.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+
+
 
 <div class="viewcode-block" id="EDA"><a class="viewcode-back" href="../code.html#eda_data.EDA">[docs]</a><span class="k">class</span> <span class="nc">EDA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -122,7 +126,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="p">,</span><span class="n">save_file</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visual</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="p">,</span><span class="n">save_file</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visual</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">        :param data: The data to be investigated.</span>
@@ -145,6 +149,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="o">=</span> <span class="n">save_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">visual</span> <span class="o">=</span> <span class="n">visual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="n">log_file</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;/outputlog.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;This is the log_file&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EDA.non_numeric_eda"><a class="viewcode-back" href="../code.html#eda_data.EDA.non_numeric_eda">[docs]</a>    <span class="k">def</span> <span class="nf">non_numeric_eda</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -184,19 +192,19 @@
 
         <span class="c1"># Running data visualization part</span>
         <span class="c1"># plotting the distribution</span>
-        <span class="n">analyze_cat</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">analyze_cat</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">visual</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">)</span>
 
         <span class="c1"># Running null analysis part</span>
-        <span class="n">an</span> <span class="o">=</span> <span class="n">AnalyzeNulls</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">an</span> <span class="o">=</span> <span class="n">AnalyzeNulls</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">visual</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">)</span>
         <span class="c1"># The location of the null values</span>
         <span class="n">an</span><span class="o">.</span><span class="n">locations</span><span class="p">()</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">--------------Correlation between variables with null values--------------&#39;</span><span class="p">)</span>
-        <span class="n">cor_btwn_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">cor_btwn_nulls</span><span class="p">(</span><span class="n">visual</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">,</span> <span class="n">save_pic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">)</span>
+        <span class="n">cor_btwn_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">cor_btwn_nulls</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">cor_btwn_nulls_df</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">------------Correlation with variables at the nulls location--------------&#39;</span><span class="p">)</span>
-        <span class="n">corr_with_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">corr_with_nulls</span><span class="p">(</span><span class="n">visual</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">,</span> <span class="n">save_pic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">)</span>
+        <span class="n">corr_with_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">corr_with_nulls</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">corr_with_nulls_df</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">--------------null_combinations: Non_numeric variables--------------&#39;</span><span class="p">)</span>
@@ -248,26 +256,27 @@
 
         <span class="c1"># Running data visualization part</span>
         <span class="c1"># plotting 6 graphs</span>
-        <span class="n">analyze_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">analyze_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">visual</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">)</span>
         <span class="c1"># plotting the correlation</span>
-        <span class="n">analyze_numeric_correlations</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">analyze_numeric_correlations</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">visual</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">)</span>
 
         <span class="c1"># Running null analysis part</span>
-        <span class="n">an</span> <span class="o">=</span> <span class="n">AnalyzeNulls</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">an</span> <span class="o">=</span> <span class="n">AnalyzeNulls</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">visual</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">)</span>
         <span class="c1"># The location of the null values</span>
-        <span class="n">an</span><span class="o">.</span><span class="n">locations</span><span class="p">(</span><span class="n">save_pic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">)</span>
+        <span class="n">an</span><span class="o">.</span><span class="n">locations</span><span class="p">()</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">--------------Correlation between varibales with null values--------------&#39;</span><span class="p">)</span>
-        <span class="n">cor_btwn_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">cor_btwn_nulls</span><span class="p">(</span><span class="n">visual</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">,</span> <span class="n">save_pic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">)</span>
+        <span class="n">cor_btwn_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">cor_btwn_nulls</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">cor_btwn_nulls_df</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">------------Correlation with varibales at the nulls location--------------&#39;</span><span class="p">)</span>
-        <span class="n">corr_with_nulls_df</span><span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">corr_with_nulls</span><span class="p">(</span><span class="n">visual</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">,</span> <span class="n">save_pic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">)</span>
+        <span class="n">corr_with_nulls_df</span><span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">corr_with_nulls</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">corr_with_nulls_df</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">------------boxplots by null--------------&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
-            <span class="n">an</span><span class="o">.</span><span class="n">boxplots_by_null</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span> <span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="n">an</span><span class="o">.</span><span class="n">boxplots_by_null</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;There is only one variable: No boxplots by null will be plotted in numeric variables&#39;</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">--------------null_combinations: Numeric variables--------------&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">See which numeric variables are commonly null at the same time. A 1 denotes the column being null and a 0 denotes&#39;</span><span class="p">)</span>
@@ -292,16 +301,25 @@
               <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">numerical_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">object_columns</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">))</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;data_profiling_total.xlsx&#39;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Output data profiling will be saved in :&#39;</span> <span class="p">,</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">--------------Saving data descriptive information in </span><span class="si">%s</span><span class="s1">-------------- :</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s1">&#39;Plotting the results: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">Saving the results: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">Saving the log: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
         <span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>  <span class="c1"># doctest: +SKIP</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The data profiling results is saved in </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">numerical_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&gt;&gt;&gt; NUMERIC VARIABLES &lt;&lt;&lt;</span><span class="se">\n</span><span class="s1">*********************************&#39;</span><span class="p">)</span>
                 <span class="n">dp</span><span class="o">.</span><span class="n">numeric_profile_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Numerical_data_profile&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">numeric_eda</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">object_columns</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&gt;&gt;&gt; NON-NUMERIC VARIABLES &lt;&lt;&lt;</span><span class="se">\n</span><span class="s1">*********************************&#39;</span><span class="p">)</span>
                 <span class="n">dp</span><span class="o">.</span><span class="n">non_numeric_profile_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Non-numerical_data_profile&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">non_numeric_eda</span><span class="p">()</span>
             <span class="k">if</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">numerical_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">object_columns</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&gt;&gt;&gt; ALL VARIABLES &lt;&lt;&lt;</span><span class="se">\n</span><span class="s1">*********************************&#39;</span><span class="p">)</span>
                 <span class="n">dp</span><span class="o">.</span><span class="n">total_profile_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;All_data_profile&#39;</span><span class="p">)</span>
                 <span class="c1"># Running data visualization part</span>
                 <span class="c1"># # plotting 6 graphs</span>
@@ -310,23 +328,24 @@
                 <span class="c1"># analyze_numeric_correlations(df, path=self.path)</span>
 
                 <span class="c1"># Running null analysis part</span>
-                <span class="n">an</span> <span class="o">=</span> <span class="n">AnalyzeNulls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">an</span> <span class="o">=</span> <span class="n">AnalyzeNulls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">visual</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">)</span>
                 <span class="c1"># The location of the null values</span>
                 <span class="c1"># an.locations(save_pic=self.save_file)</span>
 
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">--------------Correlation between varibales with null values--------------&#39;</span><span class="p">)</span>
-                <span class="n">cor_btwn_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">cor_btwn_nulls</span><span class="p">(</span><span class="n">visual</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">,</span> <span class="n">save_pic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">)</span>
+                <span class="n">cor_btwn_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">cor_btwn_nulls</span><span class="p">()</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">cor_btwn_nulls_df</span><span class="p">)</span>
 
 
 
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">------------Correlation with varibales at the nulls location--------------&#39;</span><span class="p">)</span>
-                <span class="n">corr_with_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">corr_with_nulls</span><span class="p">(</span><span class="n">visual</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visual</span><span class="p">,</span> <span class="n">save_pic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">)</span>
+                <span class="n">corr_with_nulls_df</span> <span class="o">=</span> <span class="n">an</span><span class="o">.</span><span class="n">corr_with_nulls</span><span class="p">()</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">corr_with_nulls_df</span><span class="p">)</span>
 
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">------------boxplots by null--------------&#39;</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">.</span><span class="n">columns</span><span class="p">):</span>
-                    <span class="n">an</span><span class="o">.</span><span class="n">boxplots_by_null</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="n">an</span><span class="o">.</span><span class="n">boxplots_by_null</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;There is only one variable: No boxplots by null will be plotted in total variables&#39;</span><span class="p">)</span>
 
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">--------------null_combinations: Numeric variables--------------&#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span>

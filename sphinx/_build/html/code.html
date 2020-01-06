@@ -41,7 +41,7 @@
 It includes data profiling, data visualization, and null analyzing.</p>
 <dl class="class">
 <dt id="eda_data.EDA">
-<em class="property">class </em><code class="descclassname">eda_data.</code><code class="descname">EDA</code><span class="sig-paren">(</span><em>data: pandas.core.frame.DataFrame</em>, <em>path=''</em>, <em>save_file=True</em>, <em>visual=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eda_data.html#EDA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_data.EDA" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">eda_data.</code><code class="descname">EDA</code><span class="sig-paren">(</span><em>data: pandas.core.frame.DataFrame</em>, <em>path=''</em>, <em>save_file=True</em>, <em>visual=True</em>, <em>log_file=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eda_data.html#EDA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_data.EDA" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -205,13 +205,176 @@ non_numeric_eda if the data has any non-numeric variables.</dd>
 <div class="section" id="data-profiling">
 <h3>Data profiling<a class="headerlink" href="#data-profiling" title="Permalink to this headline">¶</a></h3>
 <p>This class will provide some information about the data and their values.</p>
+<dl class="class">
+<dt id="data_profiling.DataProfiling">
+<em class="property">class </em><code class="descclassname">data_profiling.</code><code class="descname">DataProfiling</code><span class="sig-paren">(</span><em>data: pandas.core.frame.DataFrame</em>, <em>path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_profiling.html#DataProfiling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_profiling.DataProfiling" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Leila Norouzi</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">27 Dec 2019</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Description:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<p>data: pd.DataFrame – The data to be investigated
+path: str – The path for saving the results
+numerical_columns: list – The name of the numeric variables (columns) in the data
+object_columns: list – The name of the non-numeric variables (columns) in the data
+datetime_columns: list – The name of the date-time type variables (columns) in the data
+string_columns: list – The name of the string type variables (columns) in the data
+numeric_data: pd.DataFrame – The numeric variables (columns) of the data
+string_data: pd.DataFrame – The string type variables (columns) of the data
+datetime_data: pd.DataFrame – The date-time type variables (columns) of the data
+non_numeric_data: pd.DataFrame – The non-numeric variables (columns) of the data
+numeric_profile_df: pd.DataFrame – The data profile for numeric variables (columns)
+non_numeric_profile_df: pd.DataFrame – The data profile for non-numeric variables (columns)
+total_profile_df: pd.DataFrame – The data profile for all variables (columns)</p>
+<dl class="docutils">
+<dt>datetime_identification: This functions looks at the non-numeric columns od the data and search if they have any</dt>
+<dd>date/time format. Then returns the name of those columns.</dd>
+<dt>numeric_profile: This function takes the numeric variables of the data and for each variable generates a basic data</dt>
+<dd><dl class="first last docutils">
+<dt>description such as</dt>
+<dd><ul class="first simple">
+<li>The type of the variable as numeric, the size of the data,</li>
+<li>The max, min, mean, median, standard deviation  and the range of the variable,</li>
+<li>Number of nulls, non-nulls and percentage of null values,</li>
+<li>The unique values , number of unique values and their frequency counts</li>
+<li>The longest and shortest length of the string version of values and their values, and the shortest length</li>
+</ul>
+<blockquote>
+<div>of the non-null value for each variable.</div></blockquote>
+<ul class="last simple">
+<li>The top frequent value and the count is set to NA as they are set for non-numeric variables</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>non_numeric_profile: This function takes the non-numeric variables of the data and for each variable generates a</dt>
+<dd><dl class="first last docutils">
+<dt>basic data description such as</dt>
+<dd><ul class="first last simple">
+<li>The type of the variable as non-numeric, the size of the data,</li>
+<li>The max and min values as teh first  and the last values when the variable is sorted</li>
+<li>The median, standard deviation  and the range of the variable are set to NA</li>
+<li>Number of nulls, non-nulls and percentage of null values,</li>
+<li>The unique values , number of unique values and their frequency counts</li>
+<li>The longest and shortest length of values and their values, and the shortest length of the non-null
+value for each variable.</li>
+<li>The top most frequent value and the count</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
+<dt id="data_profiling.DataProfiling.datatime_convert">
+<code class="descname">datatime_convert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_profiling.html#DataProfiling.datatime_convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_profiling.DataProfiling.datatime_convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>this function detects if there is any possible date-time format among the variables.
+convert string variables in the data-time format to date-time type
+:return: pd.Dataframe</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data_profiling.DataProfiling.datetime_identification">
+<code class="descname">datetime_identification</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="_modules/data_profiling.html#DataProfiling.datetime_identification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_profiling.DataProfiling.datetime_identification" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Description:</th><td class="field-body">This functions looks at the non-numeric columns od the data and search if they have any</td>
+</tr>
+</tbody>
+</table>
+<p>date/time format. Then returns the name of those columns.</p>
+<p>:return :  list –  date-time column names</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data_profiling.DataProfiling.non_numeric_profile">
+<code class="descname">non_numeric_profile</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/data_profiling.html#DataProfiling.non_numeric_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_profiling.DataProfiling.non_numeric_profile" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Description:</th><td class="field-body">This function takes the non-numeric variables of the data and for each variable generates a</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>basic data description such as</dt>
+<dd><ul class="first last simple">
+<li>The type of the variable as non-numeric, the size of the data,</li>
+<li>The max and min values as teh first  and the last values when the variable is sorted</li>
+<li>The median, standard deviation  and the range of the variable are set to NA</li>
+<li>Number of nulls, non-nulls and percentage of null values,</li>
+<li>The unique values , number of unique values and their frequency counts</li>
+<li>The longest and shortest length of values and their values, and the shortest length of the non-null
+value for each variable.</li>
+<li>The top most frequent value and the count</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">pd.DataFrame – A descriptive information about non-numerical variables of the data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data_profiling.DataProfiling.numeric_profile">
+<code class="descname">numeric_profile</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/data_profiling.html#DataProfiling.numeric_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_profiling.DataProfiling.numeric_profile" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Description:</th><td class="field-body">This function takes the numeric variables of the data and for each variable generates a basic data</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>description such as</dt>
+<dd><ul class="first simple">
+<li>The type of the variable as numeric, the size of the data,</li>
+<li>The max, min, mean, median, standard deviation  and the range of the variable,</li>
+<li>Number of nulls, non-nulls and percentage of null values,</li>
+<li>The unique values , number of unique values and their frequency counts</li>
+<li>The longest and shortest length of the string version of values and their values, and the shortest length</li>
+</ul>
+<blockquote>
+<div>of the non-null value for each variable.</div></blockquote>
+<ul class="last simple">
+<li>The top frequent value and the count is set to NA as they are set for non-numeric variables</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">pd.DataFrame –  A descriptive information about numerical variables of the data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="null-analyzing">
 <h3>Null analyzing<a class="headerlink" href="#null-analyzing" title="Permalink to this headline">¶</a></h3>
 <p>This class will process the data to provide some information about the null values in the data.</p>
 <dl class="class">
 <dt id="analyze_nulls.AnalyzeNulls">
-<em class="property">class </em><code class="descclassname">analyze_nulls.</code><code class="descname">AnalyzeNulls</code><span class="sig-paren">(</span><em>data: pandas.core.frame.DataFrame</em>, <em>path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">analyze_nulls.</code><code class="descname">AnalyzeNulls</code><span class="sig-paren">(</span><em>data: pandas.core.frame.DataFrame</em>, <em>visual=True</em>, <em>save_pic=True</em>, <em>path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -264,7 +427,7 @@ in y, and vice versa.</dd>
 </dl>
 <dl class="method">
 <dt id="analyze_nulls.AnalyzeNulls.boxplots_by_null">
-<code class="descname">boxplots_by_null</code><span class="sig-paren">(</span><em>var: str</em>, <em>save_pic=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls.boxplots_by_null"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls.boxplots_by_null" title="Permalink to this definition">¶</a></dt>
+<code class="descname">boxplots_by_null</code><span class="sig-paren">(</span><em>var: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls.boxplots_by_null"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls.boxplots_by_null" title="Permalink to this definition">¶</a></dt>
 <dd><p>View distribution in variables, split based on whether the observation has var null.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -285,7 +448,7 @@ in y, and vice versa.</dd>
 
 <dl class="method">
 <dt id="analyze_nulls.AnalyzeNulls.cor_btwn_nulls">
-<code class="descname">cor_btwn_nulls</code><span class="sig-paren">(</span><em>visual=True</em>, <em>save_pic=True</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls.cor_btwn_nulls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls.cor_btwn_nulls" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cor_btwn_nulls</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls.cor_btwn_nulls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls.cor_btwn_nulls" title="Permalink to this definition">¶</a></dt>
 <dd><p>See which columns’s nulls are correlated to which other column’s nulls. E.g. if Var A and Var B are null
 for all the same rows, they will have correlation 1.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -307,7 +470,7 @@ for all the same rows, they will have correlation 1.</p>
 
 <dl class="method">
 <dt id="analyze_nulls.AnalyzeNulls.corr_with_nulls">
-<code class="descname">corr_with_nulls</code><span class="sig-paren">(</span><em>visual=True</em>, <em>save_pic=True</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls.corr_with_nulls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls.corr_with_nulls" title="Permalink to this definition">¶</a></dt>
+<code class="descname">corr_with_nulls</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls.corr_with_nulls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls.corr_with_nulls" title="Permalink to this definition">¶</a></dt>
 <dd><p>See which columns have correlation with a variable being null. The rows correspond to a variable and the columns
 are an indicator for whether a variable is null. E.g. the data at left would result in the following table</p>
 <blockquote>
@@ -346,7 +509,7 @@ are included as rows, and only columns with nulls are included as columns.</p>
 
 <dl class="method">
 <dt id="analyze_nulls.AnalyzeNulls.locations">
-<code class="descname">locations</code><span class="sig-paren">(</span><em>save_pic=True</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls.locations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls.locations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">locations</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/analyze_nulls.html#AnalyzeNulls.locations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analyze_nulls.AnalyzeNulls.locations" title="Permalink to this definition">¶</a></dt>
 <dd><p>See where in data missing values are located. Nulls are shown in white.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -434,7 +597,7 @@ True it will save the results in given path.</dd>
 </dl>
 <dl class="function">
 <dt id="eda_functions.analyze_cat">
-<code class="descclassname">eda_functions.</code><code class="descname">analyze_cat</code><span class="sig-paren">(</span><em>df</em>, <em>save_pic=True</em>, <em>path=''</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/eda_functions.html#analyze_cat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_functions.analyze_cat" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">eda_functions.</code><code class="descname">analyze_cat</code><span class="sig-paren">(</span><em>df</em>, <em>save_pic=True</em>, <em>visual=True</em>, <em>path=''</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/eda_functions.html#analyze_cat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_functions.analyze_cat" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -458,7 +621,7 @@ True it will save the results in given path.</dd>
 
 <dl class="function">
 <dt id="eda_functions.analyze_numeric">
-<code class="descclassname">eda_functions.</code><code class="descname">analyze_numeric</code><span class="sig-paren">(</span><em>df</em>, <em>save_pic=True</em>, <em>path=''</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/eda_functions.html#analyze_numeric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_functions.analyze_numeric" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">eda_functions.</code><code class="descname">analyze_numeric</code><span class="sig-paren">(</span><em>df</em>, <em>visual=True</em>, <em>save_pic=True</em>, <em>path=''</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/eda_functions.html#analyze_numeric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_functions.analyze_numeric" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -482,6 +645,7 @@ True it will save the results in given path.</dd>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>df</strong> (<em>pandas data frame</em>) – The data to be investigated.</li>
+<li><strong>visual</strong> – if the user wants to plot the results</li>
 <li><strong>save_pic</strong> (<em>bool</em>) – if the user wants to save the results. default is True to save the results as a png file.</li>
 </ul>
 </td>
@@ -495,7 +659,7 @@ True it will save the results in given path.</dd>
 
 <dl class="function">
 <dt id="eda_functions.analyze_numeric_correlations">
-<code class="descclassname">eda_functions.</code><code class="descname">analyze_numeric_correlations</code><span class="sig-paren">(</span><em>df</em>, <em>save_pic=True</em>, <em>path=''</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/eda_functions.html#analyze_numeric_correlations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_functions.analyze_numeric_correlations" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">eda_functions.</code><code class="descname">analyze_numeric_correlations</code><span class="sig-paren">(</span><em>df</em>, <em>visual=True</em>, <em>save_pic=True</em>, <em>path=''</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/eda_functions.html#analyze_numeric_correlations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_functions.analyze_numeric_correlations" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -517,38 +681,6 @@ True it will save the results in given path.</dd>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None, a plot.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="eda_functions.analyze_pair">
-<code class="descclassname">eda_functions.</code><code class="descname">analyze_pair</code><span class="sig-paren">(</span><em>df: pandas.core.frame.DataFrame</em>, <em>x1: str</em>, <em>x2: str</em>, <em>save_pic=True</em>, <em>path=''</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/eda_functions.html#analyze_pair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eda_functions.analyze_pair" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Description:</th><td class="field-body">It takes two variables of a data. Groups the data based on those variables and count</td>
-</tr>
-</tbody>
-</table>
-<p>the frequency of each group.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> (<em>pandas dataframe</em>) – The data</li>
-<li><strong>x1</strong> (<em>str</em>) – First variable to be grouped by</li>
-<li><strong>x2</strong> (<em>str</em>) – Second variable to be grouped by</li>
-<li><strong>save_pic</strong> (<em>bool</em>) – if the user wants to save the results. default is True to save the results as a png file.</li>
-<li><strong>path</strong> (<em>str</em>) – the path to save the plot in.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
 </td>
 </tr>
 </tbody>

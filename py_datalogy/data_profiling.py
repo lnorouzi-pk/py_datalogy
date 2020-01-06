@@ -8,7 +8,7 @@
 import pandas as pd
 from pandas.api.types import *
 from dateutil.parser import *
-from eda_functions import *
+# from eda_functions import *
 
 import numpy as np
 
@@ -91,18 +91,18 @@ class DataProfiling(object):
                                    ]
 
         self.datetime_columns = self.datetime_identification()
-        self.string_columns = list(
-            filter(
-                lambda x: x not in set(self.datetime_identification()), self.object_columns
-            ))
+        # self.string_columns = list(
+        #     filter(
+        #         lambda x: x not in set(self.datetime_identification()), self.object_columns
+        #     ))
 
         self.numeric_data = data[self.numerical_columns]
-        self.string_data = data[self.string_columns]
+        # self.string_data = data[self.string_columns]
             #if len(self.datetime_identification())>0:
             #self.datetime_data = data[self.datetime_columns].applymap(lambda x: parse(x) if not x is np.nan else x )
             #else: self.datetime_data = pd.DataFrame()
         # self.non_numeric_data = pd.concat([self.datetime_data, self.string_data], axis=1)
-        self.datetime_data = self.datatime_convert()
+        # self.datetime_data = self.datatime_convert()
         self.non_numeric_data = data[self.object_columns]
 
         self.numeric_profile_df = self.numeric_profile()
@@ -198,7 +198,7 @@ class DataProfiling(object):
             hist = pd.DataFrame(pd.Series(df.value_counts()).reset_index().values, columns=['name', 'num'])
             prof.loc['ValueFreq',col] = hist.values
             prof.loc['LongestLength', col] = df.astype('str').str.len().max()
-            prof.loc['LongestLengthVal', col] = df.astype('str').str.len().idxmax()
+            prof.loc['LongestLengthVal', col] = self.data.loc[df.astype('str').str.len().idxmax(),col]
             prof.loc['ShortestLength', col] = df.astype('str').str.len().min()
             prof.loc['ShortestLengthVal', col] = self.data.loc[df.astype('str').str.len().idxmin(),col]
             prof.loc['ShortestLengthNonNullVal', col] = df.dropna().astype('str').str.len().idxmin()
@@ -265,7 +265,7 @@ class DataProfiling(object):
             prof.loc['NumUnique', col] = df.nunique()
             prof.loc['ValueFreq',col] = hist.values
             prof.loc['LongestLength', col] = df.astype('str').str.len().max()
-            prof.loc['LongestLengthVal', col] = df.astype('str').str.len().idxmax()
+            prof.loc['LongestLengthVal', col] = self.data.loc[df.astype('str').str.len().idxmax(),col]
             prof.loc['ShortestLength', col] = df.astype('str').str.len().min()
             prof.loc['ShortestLengthVal', col] = self.data.loc[df.astype('str').str.len().idxmin(),col]
             prof.loc['ShortestLengthNonNullVal', col] = df.dropna().astype('str').str.len().idxmin()

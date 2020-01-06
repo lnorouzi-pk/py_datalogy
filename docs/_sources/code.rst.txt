@@ -19,7 +19,7 @@ Data profiling
 ++++++++++++++
 This class will provide some information about the data and their values.
 
-.. autoclass:: data_profiling
+.. autoclass:: data_profiling.DataProfiling
     :members:
 
 Null analyzing
