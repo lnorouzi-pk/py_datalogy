@@ -1,4 +1,4 @@
-shphinx/_buid
+py_datalogy/sphinx/_build/
 *.pyc
 .DS_Store
 .idea

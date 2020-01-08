@@ -6,22 +6,17 @@ It also generates data profiling as a excel file, Null analysis results and data
 
 import pandas as pd
 # import numpy as np
-from os.path import dirname, abspath, join
-import sys
-
-# Find code directory relative to our directory
-THIS_DIR = dirname(__file__)
-CODE_DIR = abspath(join(THIS_DIR, '..', 'code'))
-sys.path.append(CODE_DIR)
-
 import os
 import warnings
 
+import sys
+# dir_path = os.path.dirname(os.path.realpath(__file__))
+# sys.path.append(dir_path)
 
 
-# from data_profiling import *
-# from eda_functions import *
-# from analyze_nulls import *
+from .data_profiling import *
+from .eda_functions import *
+from .analyze_nulls import *
 
 #To ignore warning while running the code
 warnings.filterwarnings("ignore")
@@ -113,9 +108,13 @@ class EDA(object):
         self.data = data
         if path!='':
             try:
+                print('The path exist')
                 os.stat(path)
             except:
-                os.mkdir(path)
+
+
+                print("The path doesn't exist , creating path", path)
+                os.makedirs(path)
 
         self.path = path
 
@@ -284,15 +283,16 @@ class EDA(object):
 
             if len(dp.numerical_columns) > 0:
                 print('>>> NUMERIC VARIABLES <<<\n*********************************')
-                dp.numeric_profile_df.to_excel(writer, sheet_name='Numerical_data_profile')
+                dp.numeric_profile_df.T.to_excel(writer, sheet_name='Numerical_data_profile')
                 self.numeric_eda()
             if len(dp.object_columns)>0 :
                 print('>>> NON-NUMERIC VARIABLES <<<\n*********************************')
-                dp.non_numeric_profile_df.to_excel(writer, sheet_name='Non-numerical_data_profile')
+                dp.non_numeric_profile_df.T.to_excel(writer, sheet_name='Non-numerical_data_profile')
                 self.non_numeric_eda()
             if ((len(dp.numerical_columns) > 0) & (len(dp.object_columns)>0)):
                 print('>>> ALL VARIABLES <<<\n*********************************')
-                dp.total_profile_df.to_excel(writer, sheet_name='All_data_profile')
+                dp.total_profile_df.T.to_excel(writer, sheet_name='All_data_profile')
+                dp.total_profile_df.T.to_csv(self.path+'data_profiling_total.csv',index_label=False)
                 # Running data visualization part
                 # # plotting 6 graphs
                 # analyze_numeric(df, path=self.path)

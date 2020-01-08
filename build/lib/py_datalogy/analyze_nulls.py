@@ -321,18 +321,20 @@ class AnalyzeNulls(object):
                 raise TypeError("Var must be string")
 
             fig, axes = plt.subplots(ncols=number_of_numeric_col, figsize = (17,8))
-            boxplot_df.boxplot(by=f'{var}_is_null', return_type='axes', ax=axes)
+            boxplot_df.boxplot(by=f'{var}_is_null', return_type='axes', ax=axes,fontsize = 'small'
+                               )
 
             if number_of_numeric_col >1 :
                 for x in axes:
-                    x.set_xlabel(var+' is null')
+                    x.set_xlabel(var+'\nis null',fontsize = 'small')
             else: axes.set_xlabel(var+' is null')
 
-            fig.suptitle(f'Boxplots grouped by whether {var} is null')
+            # plt.title(f'Boxplots grouped by whether {var} is null\n',fontsize = 'small')
 
             fig_name = self.path+'boxplots_by_null_'+''.join(i[0].upper() for i in self.data.columns)+'.png'
             if self.save_pic: fig.savefig(fig_name, dpi=100)
 
+            # plt.tight_layout(   )
             plt.show()
             plt.close(fig)
         else:

@@ -174,7 +174,7 @@ def analyze_numeric(df, visual=True, save_pic=True, path='') -> None:
             plt.show()
             plt.close(fig)
 
-            df.drop(u'quartiles', axis=1, inplace=True)
+            if len(no_null_col.value_counts()) >= 4: df.drop(u'quartiles', axis=1, inplace=True)
         else:
             print('****************Nothing will be plotted******************')
 

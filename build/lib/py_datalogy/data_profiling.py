@@ -183,9 +183,9 @@ class DataProfiling(object):
             prof.loc['StdValue', col] = round(np.std(df),2)
             prof.loc['Range', col] = df.max() - df.min()
             prof.loc['NumNull', col] = sum(df.isna() | df.isnull())
-            prof.loc['NonNull', col] = \
+            prof.loc['NonNull', col] = df.count()
+            prof.loc['PercentNull', col] = \
                 round(sum(df.isna() | df.isnull())*100/len(df),2)
-            prof.loc['PercentNull', col] = df.count()
 
             # Calculate the 25, 75 and 95 percentiles of the values
             # prof.loc['q25', col] = np.percentile(df.dropna(), 25)
@@ -252,9 +252,9 @@ class DataProfiling(object):
 
 
             prof.loc['NumNull', col] = sum(df.isna() | df.isnull())
-            prof.loc['NonNull', col] = \
-                round(sum(df.isna() | df.isnull())*100/len(df),2)
-            prof.loc['PercentNull', col] = df.count()
+            prof.loc['NonNull', col] = df.count()
+            prof.loc['PercentNull', col] = \
+                round(sum(df.isna() | df.isnull()) * 100 / len(df), 2)
 
             # Calculate the 25, 75 and 95 percentiles of the values
             # prof.loc['q25', col] = 'NA'
