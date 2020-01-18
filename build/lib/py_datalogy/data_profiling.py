@@ -77,6 +77,13 @@ class DataProfiling(object):
         self.path = path
         # self.features =list(data.columns)
 
+        # Identifying empty columns
+        self.empty_columns = [cols for cols in data.columns
+                              if len(data[cols].dropna()) == 0
+                              and sum(data[cols].notnull()) == 0
+                              ]
+
+
         # Identifying the columns with numerical type
         self.numerical_columns = [cols for cols in data.columns
                                    if is_numeric_dtype(data[cols])
@@ -107,7 +114,9 @@ class DataProfiling(object):
 
         self.numeric_profile_df = self.numeric_profile()
         self.non_numeric_profile_df = self.non_numeric_profile()
-        self.total_profile_df = pd.concat([self.numeric_profile_df,self.non_numeric_profile_df], axis=1)
+        self.empty_profile_df = self.empty_profile()
+        self.total_profile_df = pd.concat([self.numeric_profile_df, self.non_numeric_profile_df, self.empty_profile_df]\
+                                          , axis=1)
 
     def datatime_convert(self):
         '''
@@ -151,6 +160,7 @@ class DataProfiling(object):
         return res
 
 
+
     def numeric_profile(self) -> pd.DataFrame:
         '''
         :Description: This function takes the numeric variables of the data and for each variable generates a basic data
@@ -170,6 +180,7 @@ class DataProfiling(object):
         prof = pd.DataFrame()
 
         for col in self.numerical_columns:
+            # print('In numerical columns:',col)
             df = self.data.loc[:,col]
             prof.loc['Type', col] = df.get_dtype_counts().index.to_list()
             prof.loc['Size', col] = len(df)
@@ -225,10 +236,15 @@ class DataProfiling(object):
         prof = pd.DataFrame()
 
         for col in self.object_columns:
+            # print("@@@@@@@@@",col)
             df = self.data.loc[:,col]
             prof.loc['Type', col] = df.get_dtype_counts().index.to_list()
             prof.loc['Size', col] = len(df)
-            prof.loc['MaxValue',col] = df.sort_values(ascending=False).reset_index(drop=True)[0]
+            try:
+                prof.loc['MaxValue',col] = df.sort_values(ascending=False).reset_index(drop=True)[0]
+            except:
+                df = self.data.loc[:, col].astype('str')
+                prof.loc['MaxValue', col] = df.sort_values(ascending=False).reset_index(drop=True)[0]
             prof.loc['MinValue', col] = df.sort_values(ascending=True).reset_index(drop=True)[0]
 
             hist = pd.DataFrame(pd.Series(df.value_counts())
@@ -272,3 +288,40 @@ class DataProfiling(object):
 
         return prof
 
+    def empty_profile(self) -> pd.DataFrame:
+        '''
+        :Description: This function takes the empty variables of the data
+
+        :return: pd.DataFrame --  A descriptive information about numerical variables of the data
+        '''
+
+        #Making a profile data frame
+        prof = pd.DataFrame()
+
+        for col in self.empty_columns:
+            # print('In numerical columns:',col)
+            df = self.data.loc[:,col]
+            prof.loc['Type', col] = 'EMPTY'
+            prof.loc['Size', col] = len(df)
+            prof.loc['MaxValue',col] = 'NA'
+            prof.loc['MinValue', col] = 'NA'
+            prof.loc['Top', col] = 'NA'
+            prof.loc['Freq', col] = 'NA'
+            prof.loc['MeanValue', col] = 'NA'
+            prof.loc['MedianValue', col] = 'NA'
+            prof.loc['ModeValue', col] = 'NA'
+            prof.loc['StdValue', col] = 'NA'
+            prof.loc['Range', col] = 'NA'
+            prof.loc['NumNull', col] = len(df)
+            prof.loc['NonNull', col] = 0
+            prof.loc['PercentNull', col] = 100
+            prof.loc['UniqueValues', col] = 'NA'
+            prof.loc['NumUnique', col] = 'NA'
+            prof.loc['ValueFreq',col] = 'NA'
+            prof.loc['LongestLength', col] = 'NA'
+            prof.loc['LongestLengthVal', col] = 'NA'
+            prof.loc['ShortestLength', col] ='NA'
+            prof.loc['ShortestLengthVal', col] = 'NA'
+            prof.loc['ShortestLengthNonNullVal', col] = 'NA'
+
+        return prof

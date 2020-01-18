@@ -93,7 +93,7 @@ class EDA(object):
 
     """
 
-    def __init__(self, data:pd.DataFrame, path='' ,save_file=True, visual=True, log_file=True):
+    def __init__(self, data:pd.DataFrame, path='' ,save_file=True, visual=True, log_file=True, log_name="outputlog.txt"):
         '''
 
         :param data: The data to be investigated.
@@ -121,9 +121,11 @@ class EDA(object):
         self.save_file= save_file
         self.visual = visual
         self.log_file = log_file
+        self.log_name = log_name
 
-        if self.log_file: sys.stdout = open(os.getcwd()+'/outputlog.txt', 'w')
-        print('This is the log_file',self.log_file)
+        # if self.log_file: sys.stdout = open(os.getcwd()+'/'+self.log_name, 'w')
+        if self.log_file: sys.stdout = open(self.path + self.log_name, 'w')
+        print('This is the log_file',self.log_name)
 
     def non_numeric_eda(self) -> None:
         '''
@@ -280,50 +282,56 @@ class EDA(object):
         print(self.data.info(verbose=True))
 
         with pd.ExcelWriter(file_name) as writer:  # doctest: +SKIP
+            print("*************************************************************")
+            print("Number and list of numerical columns: %d"%(len(dp.numerical_columns)),dp.numerical_columns, '\n')
+            print("Number and list of non_numerical columns: %d"%(len(dp.object_columns)), dp.object_columns,'\n')
+            print("Number and list of empty columns: %d" % (len(dp.empty_columns)), dp.empty_columns, '\n')
+            print("*************************************************************")
 
             if len(dp.numerical_columns) > 0:
                 print('>>> NUMERIC VARIABLES <<<\n*********************************')
+
                 dp.numeric_profile_df.T.to_excel(writer, sheet_name='Numerical_data_profile')
+                dp.numeric_profile_df.T.to_csv(self.path + 'data_profiling_numeric.csv', index_label=False)
                 self.numeric_eda()
             if len(dp.object_columns)>0 :
                 print('>>> NON-NUMERIC VARIABLES <<<\n*********************************')
+
                 dp.non_numeric_profile_df.T.to_excel(writer, sheet_name='Non-numerical_data_profile')
+                dp.non_numeric_profile_df.T.to_csv(self.path + 'data_profiling_non_numeric.csv', index_label=False)
                 self.non_numeric_eda()
-            if ((len(dp.numerical_columns) > 0) & (len(dp.object_columns)>0)):
+            if ((len(dp.numerical_columns) > 0) | (len(dp.object_columns)>0)):
                 print('>>> ALL VARIABLES <<<\n*********************************')
                 dp.total_profile_df.T.to_excel(writer, sheet_name='All_data_profile')
                 dp.total_profile_df.T.to_csv(self.path+'data_profiling_total.csv',index_label=False)
-                # Running data visualization part
-                # # plotting 6 graphs
-                # analyze_numeric(df, path=self.path)
-                # # plotting the correlation
-                # analyze_numeric_correlations(df, path=self.path)
+                print('###data_profiling_total.csv is save in ',self.path)
 
-                # Running null analysis part
-                an = AnalyzeNulls(self.data , path=self.path, visual=self.visual)
-                # The location of the null values
-                # an.locations(save_pic=self.save_file)
+                if self.visual:
+                    # Running null analysis part
+                    an = AnalyzeNulls(self.data , path=self.path, visual=self.visual)
+                    # The location of the null values
+                    # an.locations(save_pic=self.save_file)
 
-                print('\n\n--------------Correlation between varibales with null values--------------')
-                cor_btwn_nulls_df = an.cor_btwn_nulls()
-                print(cor_btwn_nulls_df)
+                    print('\n\n--------------Correlation between varibales with null values--------------')
+                    cor_btwn_nulls_df = an.cor_btwn_nulls()
+                    print(cor_btwn_nulls_df)
 
 
 
-                print('\n\n------------Correlation with varibales at the nulls location--------------')
-                corr_with_nulls_df = an.corr_with_nulls()
-                print(corr_with_nulls_df)
+                    print('\n\n------------Correlation with varibales at the nulls location--------------')
+                    corr_with_nulls_df = an.corr_with_nulls()
+                    print(corr_with_nulls_df)
 
-                print('\n\n------------boxplots by null--------------')
-                for x in list(self.data.columns):
-                    if len(list(self.data.columns))>1: an.boxplots_by_null(var=x)
-                    else: print('There is only one variable: No boxplots by null will be plotted in total variables')
+                    print('\n\n------------boxplots by null--------------')
+                    for x in list(self.data.columns):
+                        if len(list(self.data.columns))>1: an.boxplots_by_null(var=x)
+                        else: print('There is only one variable: No boxplots by null will be plotted in total variables')
 
-                print('\n--------------null_combinations: Numeric variables--------------')
-                print(
-                    '\tSee which numeric variables are commonly null at the same time. A 1 denotes the column being null and a 0 denotes')
-                print('\tit having a value. Freq counts the number of rows with this pattern.\n\n')
-                print(an.null_combinations())
+                    print('\n--------------null_combinations: Numeric variables--------------')
+                    print(
+                        '\tSee which numeric variables are commonly null at the same time. A 1 denotes the column being null and a 0 denotes')
+                    print('\tit having a value. Freq counts the number of rows with this pattern.\n\n')
+                    print(an.null_combinations())
 
 
         return file_name
