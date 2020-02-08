@@ -87,12 +87,15 @@ class DataProfiling(object):
         # Identifying the columns with numerical type
         self.numerical_columns = [cols for cols in data.columns
                                    if is_numeric_dtype(data[cols])
+                                   and not is_bool_dtype(data[cols])
+
                                    and len(data[cols].dropna()) > 0
                                    and sum(data[cols].notnull()) > 0
                                    ]
         #Identifying the columns with object type
         self.object_columns = [cols for cols in data.columns
                                    if is_object_dtype(data[cols])
+                                   or is_bool_dtype(data[cols])
                                    and len(data[cols].dropna()) > 0
                                    and sum(data[cols].notnull()) > 0
                                    ]
@@ -180,7 +183,7 @@ class DataProfiling(object):
         prof = pd.DataFrame()
 
         for col in self.numerical_columns:
-            # print('In numerical columns:',col)
+            print('In numerical columns:',col)
             df = self.data.loc[:,col]
             prof.loc['Type', col] = df.get_dtype_counts().index.to_list()
             prof.loc['Size', col] = len(df)
@@ -236,7 +239,7 @@ class DataProfiling(object):
         prof = pd.DataFrame()
 
         for col in self.object_columns:
-            # print("@@@@@@@@@",col)
+            print("In non numerical: ",col)
             df = self.data.loc[:,col]
             prof.loc['Type', col] = df.get_dtype_counts().index.to_list()
             prof.loc['Size', col] = len(df)
